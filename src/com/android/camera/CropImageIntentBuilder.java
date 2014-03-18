@@ -71,6 +71,19 @@ public class CropImageIntentBuilder {
      *        Output vertical size in pixels.
      * @param outputY
      *        Output horizontal size in pixels.
+     * @since 1.0.1
+     */
+    public CropImageIntentBuilder(final int outputX, final int outputY) {
+        this(DEFAULT_SCALE, DEFAULT_SCALE, outputX, outputY, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param outputX
+     *        Output vertical size in pixels.
+     * @param outputY
+     *        Output horizontal size in pixels.
      * @param saveUri
      *        Output file URI.
      * @since 1.0.1
