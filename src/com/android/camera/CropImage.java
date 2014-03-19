@@ -17,7 +17,8 @@
 package com.android.camera;
 
 import com.android.camera.R;
-
+import com.android.camera.datastore.CropProfileImageAccesser;
+import com.android.camera.datastore.ImageUtils;
 import com.android.camera.gallery.IImage;
 import com.android.camera.gallery.IImageList;
 
@@ -91,6 +92,8 @@ public class CropImage extends MonitoredActivity {
     private IImageList mAllImages;
     private IImage mImage;
 
+    private CropProfileImageAccesser profileAccesser;
+
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -100,6 +103,9 @@ public class CropImage extends MonitoredActivity {
         setContentView(R.layout.cropimage);
 
         mImageView = (CropImageView) findViewById(R.id.image);
+
+        profileAccesser = new CropProfileImageAccesser(this);
+        profileAccesser.open();
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -287,8 +293,8 @@ public class CropImage extends MonitoredActivity {
                 canvas.drawBitmap(mBitmap, r, rect, paint);
             }
             else {
-            	Rect dstRect = new Rect(0, 0, width, height);
-             	canvas.drawBitmap(mBitmap, r, dstRect, null);
+                Rect dstRect = new Rect(0, 0, width, height);
+                 canvas.drawBitmap(mBitmap, r, dstRect, null);
             }
 
             // Release bitmap memory as soon as possible
@@ -308,7 +314,17 @@ public class CropImage extends MonitoredActivity {
 
         // Return the cropped image directly or save it to the specified URI.
         Bundle myExtras = getIntent().getExtras();
-        if (myExtras != null && (myExtras.getParcelable("data") != null
+        if (myExtras.getBoolean(CropImageIntentBuilder.EXTRA_OUTPUT_SQLITE)) {
+            final String uid = myExtras.getString(CropImageIntentBuilder.EXTRA_OUTPUT_UID);
+            final byte[] byteData = ImageUtils.bitmapToByteArray(croppedImage);
+
+            Log.v(TAG, "saving bitmap to sqlite database for uid: " + uid);
+            profileAccesser.addImageToken(uid, byteData);
+            profileAccesser.close();
+            setResult(RESULT_OK);
+            finish();
+
+        } else if (myExtras != null && (myExtras.getParcelable("data") != null
                 || myExtras.getBoolean("return-data"))) {
             Bundle extras = new Bundle();
             extras.putParcelable("data", croppedImage);

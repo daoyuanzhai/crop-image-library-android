@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *	http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,6 +47,9 @@ public class CropImageIntentBuilder {
     private static final String EXTRA_NO_FACE_DETECTION = "noFaceDetection";
     private static final String EXTRA_CIRCLE_CROP = "circleCrop";
     private static final String EXTRA_OUTPUT_FORMAT = "outputFormat";
+
+    protected static final String EXTRA_OUTPUT_UID = "uid";
+    protected static final String EXTRA_OUTPUT_SQLITE = "save-sqlite";
 
     private static final int DEFAULT_SCALE = 1;
 
@@ -116,6 +119,12 @@ public class CropImageIntentBuilder {
         this.saveUri = saveUri;
     }
 
+    public Intent getIntent(final Context context, final String uid) {
+        if (null != this.saveUri) {
+            return this.getIntent(context, uid, false);
+        }
+        return this.getIntent(context, uid, true);
+    }
     /**
      * Builds the Intent.
      *
@@ -124,12 +133,13 @@ public class CropImageIntentBuilder {
      * @return The newly created intent.
      * @since 1.0.1
      */
-    public Intent getIntent(final Context context) {
+    public Intent getIntent(final Context context, final String uid, final boolean saveToSQLite) {
         final Intent intent = new Intent(context, CropImage.class);
 
         //
         // Required Intent extras.
         //
+        intent.putExtra(EXTRA_OUTPUT_UID, uid);
 
         intent.putExtra(EXTRA_ASPECT_X, this.aspectX);
         intent.putExtra(EXTRA_ASPECT_Y, this.aspectY);
@@ -140,7 +150,9 @@ public class CropImageIntentBuilder {
         //
         // Optional Intent Extras
         //
-
+        if (saveToSQLite) {
+            intent.putExtra(EXTRA_OUTPUT_SQLITE, true);
+        }
         intent.putExtra(EXTRA_SCALE, this.scale);
         intent.putExtra(EXTRA_SCALE_UP_IF_NEEDED, this.scaleUpIfNeeded);
         intent.putExtra(EXTRA_NO_FACE_DETECTION, !this.doFaceDetection);
