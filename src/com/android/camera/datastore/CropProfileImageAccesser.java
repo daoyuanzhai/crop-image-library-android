@@ -28,14 +28,16 @@ public class CropProfileImageAccesser extends AbstractCropImageAccesser {
 
         final int dataIndex = cursor.getColumnIndex(CropImageSQLiteHelper.PICTURE_DATA);
 
-        cursor.moveToNext();
-        final byte[] data = cursor.getBlob(dataIndex);
+        byte[] data = null;
+        if (cursor.moveToNext()) {
+            data = cursor.getBlob(dataIndex);
+        }
         cursor.close();
 
         return data;
     }
 
-    public void addImageToken (final String uid, final byte[] byteData) {
+    public void addImageByUID (final String uid, final byte[] byteData) {
         final ContentValues values = new ContentValues();
         values.put(CropImageSQLiteHelper.UID, uid);
         values.put(CropImageSQLiteHelper.PICTURE_DATA, byteData);

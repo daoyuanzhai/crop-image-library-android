@@ -319,7 +319,7 @@ public class CropImage extends MonitoredActivity {
             final byte[] byteData = ImageUtils.bitmapToByteArray(croppedImage);
 
             Log.v(TAG, "saving bitmap to sqlite database for uid: " + uid);
-            profileAccesser.addImageToken(uid, byteData);
+            profileAccesser.addImageByUID(uid, byteData);
             profileAccesser.close();
             setResult(RESULT_OK);
             finish();
